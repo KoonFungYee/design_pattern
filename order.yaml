@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  labels:
+    app: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order
+        image: koon0121/springboot-order
+        ports:
+        - containerPort: 8803
+        # resources:
+        #   limits:
+        #     cpu: 500m
+        #   requests:
+        #     cpu: 200m
+        env:
+        # - name: USER_NAME
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mysql-secret
+        #       key: mysql-user
+        # - name: USER_PWD
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password 
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: mysql-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+spec:
+  type: NodePort
+  selector:
+    app: order
+  ports:
+    - protocol: TCP
+      port: 8803
+      targetPort: 8803
+      nodePort: 30100
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata: 
+  name: order
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: order
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50

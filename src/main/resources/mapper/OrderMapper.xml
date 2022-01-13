@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.dockertest1.dao.OrderMapper">
+	<insert id="insertNewOrder" parameterType="com.example.dockertest1.dto.Order">
+		insert into `order`
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="uuid != null">
+				uuid,
+			</if>
+			<if test="pid != null">
+				pid,
+			</if>
+			<if test="totalAmt != null">
+				total_amt,
+			</if>
+			<if test="quantity != null">
+				quantity,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="cc != null">
+				cc,
+			</if>
+			<if test="notiType != null">
+				noti_type,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="uuid != null">
+				#{uuid,jdbcType=VARCHAR},
+			</if>
+			<if test="pid != null">
+				#{pid,jdbcType=INTEGER},
+			</if>
+			<if test="totalAmt != null">
+				#{totalAmt,jdbcType=DECIMAL},
+			</if>
+			<if test="quantity != null">
+				#{quantity,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="cc != null">
+				#{cc,jdbcType=INTEGER},
+			</if>
+			<if test="notiType != null">
+				#{notiType,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="getStatus" resultType="String">
+		select status from order limit 1
+	</select>
+	<update id="changeStatus">
+		update `order`
+		<set>
+			<if test="status != null">
+				status = #{status,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where uuid = #{orderNo,jdbcType=VARCHAR}
+	</update>
+	<select id="getNotiType" resultType="String">
+		select noti_type from `order` where uuid = #{orderNo,jdbcType=VARCHAR}
+	</select>
+	<select id="getAmount" resultType="DECIMAL">
+		select total_amt from `order` where uuid = #{orderNo,jdbcType=VARCHAR}
+	</select>
+</mapper>
